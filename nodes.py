@@ -16,23 +16,26 @@ class LoraTagLoader:
     def INPUT_TYPES(s):
         return {"required": { "model": ("MODEL",),
                               "text": ("STRING", {"multiline": True}),
+                              },
+                "optional": { "clip": ("CLIP", ),
                               }}
-    RETURN_TYPES = ("MODEL", "STRING")
-    RETURN_NAMES = ("MODEL", "STRING")
+    RETURN_TYPES = ("MODEL", "CLIP", "STRING")
+    RETURN_NAMES = ("MODEL", "CLIP", "STRING")
     FUNCTION = "load_lora"
 
     CATEGORY = "loaders"
 
-    def load_lora(self, model, text):
+    def load_lora(self, model, text, clip=None):
         # print(f"\nLoraTagLoader input text: { text }")
 
         founds = re.findall(self.tag_pattern, text)
         # print(f"\nfoound lora tags: { founds }")
 
         if len(founds) < 1:
-            return (model, text)
+            return (model, clip, text)
 
         model_lora = model
+        clip_lora = clip
         
         lora_files = folder_paths.get_filename_list("loras")
         for f in founds:
@@ -46,10 +49,13 @@ class LoraTagLoader:
                 name = pak[1]
             else:
                 continue
-            wModel = 0
+            wModel = wClip = 0
             try:
                 if len(pak) > 2 and len(pak[2]) > 0:
                     wModel = float(pak[2])
+                    wClip = wModel
+                if len(pak) > 3 and len(pak[3]) > 0:
+                    wClip = float(pak[3])
             except ValueError:
                 continue
             if name == None:
@@ -63,9 +69,9 @@ class LoraTagLoader:
                     lora_name = lora_file
                     break
             if lora_name == None:
-                print(f"bypassed lora tag: { (type, name, wModel) } >> { lora_name }")
+                print(f"bypassed lora tag: { (type, name, wModel, wClip) } >> { lora_name }")
                 continue
-            print(f"detected lora tag: { (type, name, wModel) } >> { lora_name }")
+            print(f"detected lora tag: { (type, name, wModel, wClip) } >> { lora_name }")
 
             lora_path = folder_paths.get_full_path("loras", lora_name)
             lora = None
@@ -81,10 +87,10 @@ class LoraTagLoader:
                 lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
                 self.loaded_lora = (lora_path, lora)
 
-            model_lora, _ = comfy.sd.load_lora_for_models(model_lora, None, lora, wModel, 0)
+            model_lora, clip_lora = comfy.sd.load_lora_for_models(model_lora, clip_lora, lora, wModel, wClip)
 
         plain_prompt = re.sub(self.tag_pattern, "", text)
-        return (model_lora, plain_prompt)
+        return (model_lora, clip_lora, plain_prompt)
 
 NODE_CLASS_MAPPINGS = {
     "LoraTagLoader": LoraTagLoader,

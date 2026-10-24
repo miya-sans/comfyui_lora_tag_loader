@@ -12,7 +12,10 @@ The custom node shall extract "_**&lt;lora:CroissantStyle:0.8&gt;**_" from posit
 ## **Matching:**
 The tag name must match a LoRA file exactly, like A1111/Forge: "_**&lt;lora:CroissantStyle:0.8&gt;**_" loads "CroissantStyle.safetensors", not "CroissantStyle-000070.safetensors". A subfolder path such as "_**&lt;lora:styles/CroissantStyle:0.8&gt;**_" is also accepted.
 
-The node only patches the model; the text encoder is not modified.
+The CLIP input is optional. Without it, only the model is patched.
+
+Adding an extra weight shall being passed as the equivalent of strength_clip in Lora Loader.
+Giving a "_**&lt;lora:CroissantStyle:0.8:0.7&gt;**_" shall patch the unet with 0.8 and patch the text encoder with 0.7.
 
 
 ## **Install:**
