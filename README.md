@@ -9,11 +9,10 @@ The custom node shall extract "_**&lt;lora:CroissantStyle:0.8&gt;**_" from posit
 <img src="https://github.com/badjeff/comfyui_lora_tag_loader/blob/master/workflows/workflow_sample.png" width="720">
 
 
-## **One More Thing:**
-Adding an extra weight shall being passed as the equivalent of strength_clip in Lora Loader.
-Giving a "_**&lt;lora:CroissantStyle:0.8:0.7&gt;**_" shall patch the unet with 0.8 and patch the text encoder with 0.7. 
+## **Matching:**
+The tag name must match a LoRA file exactly, like A1111/Forge: "_**&lt;lora:CroissantStyle:0.8&gt;**_" loads "CroissantStyle.safetensors", not "CroissantStyle-000070.safetensors". A subfolder path such as "_**&lt;lora:styles/CroissantStyle:0.8&gt;**_" is also accepted.
 
-[Ref: <a href="https://github.com/cloneofsimo/lora#what-happens-to-text-encoder-lora-and-unet-lora">What happens to Text Encoder LoRA and Unet LoRA?</a>]
+The node only patches the model; the text encoder is not modified.
 
 
 ## **Install:**
